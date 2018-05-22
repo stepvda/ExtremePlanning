@@ -12,8 +12,6 @@ function createEventsFromList() {
 
 
 function createEventsFromListForDate(affectedDate) {
-  //var calendar = CalendarApp.getCalendarById('stepvda.net_a9b0hqm7b4h9rq0pn2nkc9iu2g@group.calendar.google.com');
-  //Logger.log(calendar.getName());
   
   var calendar
   
