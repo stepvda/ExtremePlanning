@@ -13,7 +13,11 @@ function createEventsFromList() {
 
 function createEventsFromListForDate(affectedDate) {
   
+  Logger.log("starting function...");
+  Logger.log("affected date: "+affectedDate);
+  
   var calendar
+  var result
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
@@ -41,6 +45,7 @@ function createEventsFromListForDate(affectedDate) {
     start = data[i][1];   
     end = data[i][2];
     
+    result=result+"<br>event: "+title
     
     calEvents = calendar.getEventsForDay(affectedDate); //retrieve date from sheet for which to create events stored in cell F5
     calLength = calEvents.length;
@@ -63,11 +68,24 @@ function createEventsFromListForDate(affectedDate) {
      
     // create new event
     if(!eventExists) {
-       event = calendar.createEvent(title,new Date(start),new Date(end));
-       Logger.log('Event created with ID: ' + event.getId());    
+      event = calendar.createEvent(title,new Date(start),new Date(end));
+      Logger.log('Event created with ID: ' + event.getId());    
+      result=result+" - event added."
+    }
+    else  {
+      result=result+" - event already exists."
     }
   }
   
+  return result;
+  
+}
+
+
+function createEventsFromListForDate2(affectedDate) {
+  
+  return affectedDate
+
 }
 
 

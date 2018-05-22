@@ -2,7 +2,7 @@
 <html>
   <head>
     <base target = "_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
     <style>
       .logo { vertical-align: middle; }
       ul { list-style-type: none; padding: 0; }
@@ -13,32 +13,43 @@
     
     <form class="sidebar branding-below">
       
-      date: <input type="text" value="21/05/2018" />
+      date: <input type="text" id="affectedDate" value="22/05/2018" />
       <br>
       <div class="block" id="button-bar">
    <!--   <input type="button" value="run" name="run-CreateEvents"  /> -->
-      <button class="blue" id="run-CreateEvents">Create Events</button> 
+   <!--   <button class="blue" id="run-CreateEvents" onclick="google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate2($('#affectedDate').val());" >Create Events</button> --> 
+      <button class="blue" id="run-CreateEvents" onclick="google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate('22/05/2018');" >Create Events</button>
+      
+      
       </div>
       <br>
       v5
+      <br>
+      <textarea class="width-50" id="output" rows="3" placeholder="output"></textarea> 
     </form>
     
+    <div id="sidebarValues">
+    </div>
+    <div id="error">
+    </div>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script>
-      //On document load assign click handlers
-      /*$(function() {
-        $('#run-CreateEvents').click(createEvents);
-        //window.alert("hello");
-      });
-      */
-    
-    
-      function createEvents() {
-        //get affected date
-        var affectedDate = $('input[name=affectedDate]').val();
-        window.alert(affectedDate);
-        //google.script.run.createEventsFromList(affectedDate);
-    
+      function updateSidebarValues(returnedValueFromGetTextAreaStuffInYourCodeGSFile) {
+        if (returnedValueFromGetTextAreaStuffInYourCodeGSFile !='ErrorStuff'){
+          var div = document.getElementById('sidebarValues');
+          div.innerHTML =  returnedValueFromGetTextAreaStuffInYourCodeGSFile;
+          var errorDiv = document.getElementById('error');
+          errorDiv.innerHTML = "";
+          $('#output').val(returnedValueFromGetTextAreaStuffInYourCodeGSFile);
+        }
+        else{
+          var div = document.getElementById('sidebarValues');
+          div.innerHTML = "";
+          var errorDiv = document.getElementById('error');
+          errorDiv.innerHTML = 'There was an error.';
+        }
+      }
     </script>
   </body>
 </html>
