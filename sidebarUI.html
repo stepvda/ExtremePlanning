@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target = "_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+      .logo { vertical-align: middle; }
+      ul { list-style-type: none; padding: 0; }
+      h4 { margin: 0; }
+    </style>
+  </head>
+  <body>
+    
+    <form class="sidebar branding-below">
+      
+      date: <input type="text" value="21/05/2018" />
+      <br>
+      <div class="block" id="button-bar">
+   <!--   <input type="button" value="run" name="run-CreateEvents"  /> -->
+      <button class="blue" id="run-CreateEvents">Create Events</button> 
+      </div>
+      <br>
+      v5
+    </form>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+      //On document load assign click handlers
+      /*$(function() {
+        $('#run-CreateEvents').click(createEvents);
+        //window.alert("hello");
+      });
+      */
+    
+    
+      function createEvents() {
+        //get affected date
+        var affectedDate = $('input[name=affectedDate]').val();
+        window.alert(affectedDate);
+        //google.script.run.createEventsFromList(affectedDate);
+    
+    </script>
+  </body>
+</html>
+
+
