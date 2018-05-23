@@ -14,10 +14,32 @@ function createEventsFromList() {
 function createEventsFromListForDate(affectedDate) {
   
   Logger.log("starting function...");
-  Logger.log("affected date: "+affectedDate);
+  Logger.log("affected date: " + affectedDate);
+  Logger.log("affected date type: "+ typeof affectedDate);
+  
+
+  if(typeof affectedDate == "string") {
+    var dateDay = new Number(affectedDate.substr(0,2));
+    var dateMonth = new Number(affectedDate.substr(3,2));
+    var dateYear = new Number(affectedDate.substr(6,4));
+    Logger.log(dateDay);
+    Logger.log(dateMonth);
+    Logger.log(dateYear);
+    //affectedDate = new Date(dateYear, dateMonth, dateDay,0,0,0,0);
+    affectedDate = new Date()
+    affectedDate.setUTCFullYear(dateYear);
+    affectedDate.setUTCMonth(dateMonth-1);
+    affectedDate.setUTCDate(dateDay);
+    affectedDate.setUTCSeconds(1);
+    affectedDate.setHours(0);
+    affectedDate.setUTCMinutes(0);
+  }
+  Logger.log("affected date type: "+ typeof affectedDate);
+  Logger.log("affected date: " + affectedDate);
+  
   
   var calendar
-  var result
+  var result = "output: "
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
@@ -47,7 +69,10 @@ function createEventsFromListForDate(affectedDate) {
     
     result=result+"<br>event: "+title
     
+    //next funtion will file if affectedDate is not Date() type
     calEvents = calendar.getEventsForDay(affectedDate); //retrieve date from sheet for which to create events stored in cell F5
+   
+    
     calLength = calEvents.length;
     
     //check if event title exists in calendar
@@ -68,8 +93,10 @@ function createEventsFromListForDate(affectedDate) {
      
     // create new event
     if(!eventExists) {
-      event = calendar.createEvent(title,new Date(start),new Date(end));
-      Logger.log('Event created with ID: ' + event.getId());    
+      //event = calendar.createEvent(title,new Date(start),new Date(end));
+      if(typeof event == "object") {
+        Logger.log('Event created with ID: ' + event.getId());
+      }
       result=result+" - event added."
     }
     else  {

@@ -2,7 +2,7 @@
 <html>
   <head>
     <base target = "_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
       .logo { vertical-align: middle; }
       ul { list-style-type: none; padding: 0; }
@@ -11,22 +11,21 @@
   </head>
   <body>
     
-    <form class="sidebar branding-below">
+
       
       date: <input type="text" id="affectedDate" value="22/05/2018" />
       <br>
-      <div class="block" id="button-bar">
+    
    <!--   <input type="button" value="run" name="run-CreateEvents"  /> -->
-   <!--   <button class="blue" id="run-CreateEvents" onclick="google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate2($('#affectedDate').val());" >Create Events</button> --> 
-      <button class="blue" id="run-CreateEvents" onclick="google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate('22/05/2018');" >Create Events</button>
+      <button class="blue" id="run-CreateEvents" onclick="google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate($('#affectedDate').val());" >Create Events</button>  
+   <!--   <button class="blue" id="run-CreateEvents" onclick="google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate('22/05/2018');" >Create Events</button> -->
       
-      
-      </div>
       <br>
-      v5
+      debug: <input type="checkbox" id="debug" />
       <br>
-      <textarea class="width-50" id="output" rows="3" placeholder="output"></textarea> 
-    </form>
+      <br>
+   <!--   <textarea class="width-50" id="output" rows="3" placeholder="output"></textarea> -->
+    
     
     <div id="sidebarValues">
     </div>
@@ -41,7 +40,7 @@
           div.innerHTML =  returnedValueFromGetTextAreaStuffInYourCodeGSFile;
           var errorDiv = document.getElementById('error');
           errorDiv.innerHTML = "";
-          $('#output').val(returnedValueFromGetTextAreaStuffInYourCodeGSFile);
+          //$('#output').val(returnedValueFromGetTextAreaStuffInYourCodeGSFile);
         }
         else{
           var div = document.getElementById('sidebarValues');
