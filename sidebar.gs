@@ -12,7 +12,7 @@ function onOpen() {
 }
 
 function showTemplateSidebar() {
-  var html = HtmlService.createHtmlOutputFromFile('sidebarUI').setTitle('Run Template').setWidth(300);
+  var html = HtmlService.createHtmlOutputFromFile('createEventsUI').setTitle('Run Template').setWidth(300);
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
@@ -20,6 +20,8 @@ function showFeedbackSidebar() {
 }
 
 function showSyncSidebar() {
+  var html = HtmlService.createHtmlOutputFromFile('syncUI').setTitle('Run Template').setWidth(300);
+  SpreadsheetApp.getUi().showSidebar(html);
 }
 
 function showAnalyzeSidebar() {

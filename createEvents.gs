@@ -1,22 +1,22 @@
 function createEventsFromList() {
-  var sheet = SpreadsheetApp.getActiveSheet();
+  var sheet = SpreadsheetApp.getActiveSheet(); //config sheets must be active
   var data = sheet.getDataRange().getValues();
   var affectedDate = new Date(data[0][5]); //retrieve calenderId from sheet
   
   //Logger.log("date: "+affectedDate);
   
-  createEventsFromListForDate(affectedDate);
+  createEventsFromListForDate(affectedDate, false);
   
   
 }
 
 
-function createEventsFromListForDate(affectedDate) {
+function createEventsFromListForDate(affectedDate, debug) {
   
   Logger.log("starting function...");
   Logger.log("affected date: " + affectedDate);
   Logger.log("affected date type: "+ typeof affectedDate);
-  
+  Logger.log("debug: "+debug);
 
   if(typeof affectedDate == "string") {
     var dateDay = new Number(affectedDate.substr(0,2));
@@ -25,10 +25,10 @@ function createEventsFromListForDate(affectedDate) {
     Logger.log(dateDay);
     Logger.log(dateMonth);
     Logger.log(dateYear);
-    //affectedDate = new Date(dateYear, dateMonth, dateDay,0,0,0,0);
+    
     affectedDate = new Date()
     affectedDate.setUTCFullYear(dateYear);
-    affectedDate.setUTCMonth(dateMonth-1);
+    affectedDate.setUTCMonth(dateMonth-1); //bizar
     affectedDate.setUTCDate(dateDay);
     affectedDate.setUTCSeconds(1);
     affectedDate.setHours(0);
@@ -39,10 +39,15 @@ function createEventsFromListForDate(affectedDate) {
   
   
   var calendar
-  var result = "output: "
+  var result = "<br>output on: <br>"+new Date()+" : "
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
+  var sheetName = sheet.getName();
+  
+  Logger.log("sheet name: "+sheetName);
+  
+  if(sheetName == "event template") {
 
   var title
   var start
@@ -93,17 +98,30 @@ function createEventsFromListForDate(affectedDate) {
      
     // create new event
     if(!eventExists) {
-      //event = calendar.createEvent(title,new Date(start),new Date(end));
+      if(!debug) {
+        event = calendar.createEvent(title,new Date(start),new Date(end));
+      }
+      else {
+        result=result+" - debug - creation skipped";
+      }
+      
       if(typeof event == "object") {
         Logger.log('Event created with ID: ' + event.getId());
+        result=result+" - event added."
       }
-      result=result+" - event added."
+      
     }
     else  {
       result=result+" - event already exists."
     }
   }
   
+  }
+  else {
+    result=result+"ERROR: Wrong sheet. Please select the event template sheet before running."
+  }
+    
+    
   return result;
   
 }
