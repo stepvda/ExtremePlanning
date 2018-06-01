@@ -1,7 +1,7 @@
 function createEventsFromList() {
   var sheet = SpreadsheetApp.getActiveSheet(); //config sheets must be active
   var data = sheet.getDataRange().getValues();
-  var affectedDate = new Date(data[0][5]); //retrieve calenderId from sheet
+  var affectedDate = new Date(data[0][5]); //retrieve calenderId from sheet 
   
   //Logger.log("date: "+affectedDate);
   
@@ -26,14 +26,15 @@ function createEventsFromListForDate(affectedDate, debug) {
     Logger.log(dateMonth);
     Logger.log(dateYear);
     
-    affectedDate = new Date()
-    affectedDate.setUTCFullYear(dateYear);
+//    affectedDate = new Date()
+    affectedDate = new Date(dateYear,dateMonth-1,dateDay);
+/*    affectedDate.setUTCFullYear(dateYear);
     affectedDate.setUTCMonth(dateMonth-1); //bizar
     affectedDate.setUTCDate(dateDay);
     affectedDate.setUTCSeconds(1);
     affectedDate.setHours(0);
     affectedDate.setUTCMinutes(0);
-  }
+*/  }
   Logger.log("affected date type: "+ typeof affectedDate);
   Logger.log("affected date: " + affectedDate);
   
@@ -74,7 +75,7 @@ function createEventsFromListForDate(affectedDate, debug) {
     
     result=result+"<br>event: "+title
     
-    //next funtion will file if affectedDate is not Date() type
+    //next funtion will fail if affectedDate is not Date() type
     calEvents = calendar.getEventsForDay(affectedDate); //retrieve date from sheet for which to create events stored in cell F5
    
     
@@ -121,7 +122,8 @@ function createEventsFromListForDate(affectedDate, debug) {
     result=result+"ERROR: Wrong sheet. Please select the event template sheet before running."
   }
     
-    
+  result=result+"<br>Done.";  
+
   return result;
   
 }
@@ -173,3 +175,5 @@ function createEventsFromListWithoutCheckExists() {
   }
   
 }
+
+

@@ -12,7 +12,7 @@
       
       start date: <input type="text" id="startDate" value="14/04/2018" />
       <br>
-      end date: <input type="text" id="startDate" value="29/05/2018" />
+      end date: <input type="text" id="endDate" value="29/05/2018" />
       <br>
       
       <button class="blue" id="run-Sync">Synchronize Events</button>
@@ -33,16 +33,16 @@
      //assign event handlers (note can only contain call to other script, NOT direct call to server)
      $(function() {
         
-        $('#run-Sync').click(createEventsScript);
+        $('#run-Sync').click(syncScript);
       
       
       });  
       
       //event handler 
-      function createEventsScript() {
+      function syncScript() {
          var div = document.getElementById('sidebarValues');
          div.innerHTML = "<br>working...";
-     //    google.script.run.withSuccessHandler(updateSidebarValues).createEventsFromListForDate($('#affectedDate').val(), $('#debugCheckbox').is(':checked'))
+         google.script.run.withSuccessHandler(updateSidebarValues).sync($('#startDate').val(), $('#endDate').val(), $('#debugCheckbox').is(':checked'));
       }
       
       
@@ -55,7 +55,7 @@
           div.innerHTML =  returnedValueFromGetTextAreaStuffInYourCodeGSFile;
           var errorDiv = document.getElementById('error');
           errorDiv.innerHTML = "";
-          //$('#output').val(returnedValueFromGetTextAreaStuffInYourCodeGSFile);
+         
         }
         else{
           var div = document.getElementById('sidebarValues');
