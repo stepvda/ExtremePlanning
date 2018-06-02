@@ -33,13 +33,15 @@ function sync(startDate, endDate, debug) {
   var i2;
   var i3;
   
-  var numberOfRows;
+  var numberOfRows = 0;
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
   var sheetName = sheet.getName();
   var eventExists;
   var range;
+  
+  var calendarFilter = "stepvda.net";
   
   if(sheetName == "event list") {
   
@@ -54,8 +56,8 @@ function sync(startDate, endDate, debug) {
       Logger.log("cal color: "+calendar.getColor());
       Logger.log("cal Id: "+calId);
       
-      //filter out external calendars
-      if(calId.search("stepvda.net")>=0) {
+      //filter out external calendars based on calendarFilter variable
+      if(calId.search(calendarFilter)>=0) {
         
         //for current calendar retrieve all events
         events = calendar.getEvents(startDate, endDate);
@@ -70,13 +72,13 @@ function sync(startDate, endDate, debug) {
           eventId = event.getId();
           
           Logger.log("event title: "+eventTitle);
-          Logger.log("event start: "+eventStart);
-          Logger.log("event end: "+eventEnd);
+          //Logger.log("event start: "+eventStart);
+          //Logger.log("event end: "+eventEnd);
           
           eventExists = false;
           //check if event already exists in sheet by searching for the current eventId in sheet
           for(i3=0;i3 < data.length ; i3++) {
-            if(eventId == data[i3][11]) {
+            if(eventId == data[i3][12]) {
               eventExists = true;
             }
           }
@@ -85,18 +87,41 @@ function sync(startDate, endDate, debug) {
           //if event does not exist in sheet add it
           if(eventExists == true) {
             Logger.log("event exists already in sheet");
+            //check if event needs to be updated
+            
           }
           else {
             Logger.log("event does not exist yet in sheet");
             
-            sheet.appendRow([eventStart.getUTCFullYear(),"1","2","3","4",eventTitle,"6","7","8","9",calId,eventId,eventStart,eventEnd,eventStart.getTime(),calColor,"16"]);
+            if(debug == false) {
+              sheet.appendRow([
+                eventStart.getUTCFullYear(),
+                eventStart.getWeek(),
+                dateToString(eventStart),
+                getTimeFromDate(eventStart),
+                getTimeFromDate(eventEnd),
+                eventTitle,
+                getDuration(eventStart,eventEnd),
+                calName,
+                "7", //feedback
+                "8", 
+                event.getDescription(),
+                calId,
+                eventId,
+                eventStart,
+                eventEnd,
+                eventStart.getTime(),
+                calColor
+              ]);
+          
+              //set the background color of the row matching the calendar color
+              numberOfRows = sheet.getLastRow();
+              Logger.log("number of rows: "+numberOfRows);
+              range =  sheet.getRange(numberOfRows,1,1,17);
+              range.setBackground(calColor);
+            }
             
-            
-            //set the background color of the row matching the calendar color
-            numberOfRows = sheet.getLastRow();
-            Logger.log("number of rows: "+numberOfRows);
-            range =  sheet.getRange(numberOfRows,1,1,17);
-            range.setBackground(calColor);
+          
           }  
           
           
@@ -119,11 +144,10 @@ function sync(startDate, endDate, debug) {
       
       
       
-      
+    result=result+"<br>Synchronized "+numberOfRows+" rows";   
   }
-
   else {
-    result=result+"ERROR: Wrong sheet. Please select the event list sheet before running.";
+    result=result+"<br>ERROR: Wrong sheet. Please select the event list sheet before running.";
   }
   
   result=result+"<br>Done.";
@@ -147,14 +171,7 @@ function stringToDate(date) {
     
     
     date = new Date(dateYear,dateMonth-1,dateDay);
-   /* date = new Date()
-    date.setUTCFullYear(dateYear);
-    date.setUTCMonth(dateMonth-1); //bizar
-    date.setUTCDate(dateDay);
-    date.setUTCSeconds(1);
-    date.setHours(0);
-    date.setUTCMinutes(0);
- */
+   
   }
   Logger.log("date type: "+ typeof date);
   Logger.log("date: " + date);
@@ -162,5 +179,92 @@ function stringToDate(date) {
   return date;
 }
 
+function dateToString(date) {
+  var dateString = "";
+  
+  if(typeof date == "object") {
+    if(date.getDate()<10) {
+      dateString = "0";
+    }
+    dateString = dateString+date.getDate().toString();
+    dateString = dateString+"/"+(date.getMonth()+1).toString();
+    dateString = dateString+"/"+date.getYear();
+  }
+  return dateString;
+}
 
+
+function getTimeFromDate(date) {
+  var timeString = "";
+  
+  if(typeof date == "object") {
+    if(date.getHours()<10) {
+      timeString="0";
+    }
+    timeString = timeString+date.getUTCHours().toString();
+    if(date.getMinutes()<10) {
+      timeString=timeString+":0";
+    }
+    else {
+      timeString=timeString+":";
+    }
+    timeString = timeString+date.getMinutes();
+  }
+  return timeString;
+}
+
+function getDuration(startDate,endDate) {
+  var duration;
+  var durationNumber;
+  var durationHours;
+  var durationMinutes;
+  
+  durationNumber = endDate.getTime()-startDate.getTime();
+  duration = new Date();
+  duration.setTime(durationNumber);
+  Logger.log(duration);
+  
+  durationNumber = durationNumber/1000/60; //convert to minutes
+  Logger.log(durationNumber);
+  
+  duration = getTimeFromDate(duration);
+  
+  return duration;
+}
+
+
+/**
+ * Returns the week number for this date.  dowOffset is the day of week the week
+ * "starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
+ * the week returned is the ISO 8601 week number.
+ * @param int dowOffset
+ * @return int
+ */
+Date.prototype.getWeek = function (dowOffset) {
+/*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.epoch-calendar.com */
+
+	dowOffset = typeof(dowOffset) == 'int' ? dowOffset : 0; //default dowOffset to zero
+	var newYear = new Date(this.getFullYear(),0,1);
+	var day = newYear.getDay() - dowOffset; //the day of week the year begins on
+	day = (day >= 0 ? day : day + 7);
+	var daynum = Math.floor((this.getTime() - newYear.getTime() - 
+	(this.getTimezoneOffset()-newYear.getTimezoneOffset())*60000)/86400000) + 1;
+	var weeknum;
+	//if the year starts before the middle of a week
+	if(day < 4) {
+		weeknum = Math.floor((daynum+day-1)/7) + 1;
+		if(weeknum > 52) {
+			nYear = new Date(this.getFullYear() + 1,0,1);
+			nday = nYear.getDay() - dowOffset;
+			nday = nday >= 0 ? nday : nday + 7;
+			/*if the next year starts before the middle of
+ 			  the week, it is week #1 of that year*/
+			weeknum = nday < 4 ? 1 : 53;
+		}
+	}
+	else {
+		weeknum = Math.floor((daynum+day-1)/7);
+	}
+	return weeknum;
+};
 
