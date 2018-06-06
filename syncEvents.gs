@@ -28,10 +28,16 @@ function sync(startDate, endDate, debug) {
   var eventStart;
   var eventEnd;
   var eventId;
+  var eventLastUpdated;
+  var numberOfEventsUpdated = 0;
+  var numberOfNewEvents = 0;
+  var numberOfDeletedEvents = 0;
+  var rowToUpdate;
 
   var i1;
   var i2;
   var i3;
+  var i4;
   
   var numberOfRows = 0;
   
@@ -40,11 +46,16 @@ function sync(startDate, endDate, debug) {
   var sheetName = sheet.getName();
   var eventExists;
   var range;
+  var formattingRange;
   
   var calendarFilter = "stepvda.net";
   
   if(sheetName == "event list") {
   
+    //remove title row
+    sheet.deleteRow(1);
+    
+    
     //going through all calendars
     for(i1=0;i1<numberOfCalendars;i1++) {
       calendar = calendars[i1];
@@ -70,6 +81,7 @@ function sync(startDate, endDate, debug) {
           eventStart =  event.getStartTime();
           eventEnd = event.getEndTime();
           eventId = event.getId();
+          eventLastUpdated = event.getLastUpdated();
           
           Logger.log("event title: "+eventTitle);
           //Logger.log("event start: "+eventStart);
@@ -80,6 +92,7 @@ function sync(startDate, endDate, debug) {
           for(i3=0;i3 < data.length ; i3++) {
             if(eventId == data[i3][12]) {
               eventExists = true;
+              rowToUpdate = i3;
             }
           }
           
@@ -87,8 +100,36 @@ function sync(startDate, endDate, debug) {
           //if event does not exist in sheet add it
           if(eventExists == true) {
             Logger.log("event exists already in sheet");
-            //check if event needs to be updated
             
+            //check if event needs to be updated
+            if(eventLastUpdated.toString() != data[rowToUpdate][17].toString()) {
+              //event needs to be updated as the modified date has changed
+              Logger.log("event needs to be updated");
+              numberOfEventsUpdated++;
+              
+              //update values
+              sheet.getRange(rowToUpdate,1).setValue(eventStart.getUTCFullYear()); //Year
+              sheet.getRange(rowToUpdate,2).setValue(eventStart.getWeek()); //Week
+              sheet.getRange(rowToUpdate,3).setValue(dateToString(eventStart)); //Date
+              sheet.getRange(rowToUpdate,4).setValue(getTimeFromDate(eventStart)); //Start
+              sheet.getRange(rowToUpdate,5).setValue(getTimeFromDate(eventEnd)); //End
+              sheet.getRange(rowToUpdate,6).setValue(eventTitle); //Title
+              sheet.getRange(rowToUpdate,7).setValue(getDuration(eventStart,eventEnd)); //Duration
+              sheet.getRange(rowToUpdate,8).setValue(calName); //Calendar Name
+              sheet.getRange(rowToUpdate,11).setValue(event.getDescription()); //Comment
+              sheet.getRange(rowToUpdate,12).setValue(calId); //Calendar ID
+              sheet.getRange(rowToUpdate,13).setValue(eventId); //Event ID
+              sheet.getRange(rowToUpdate,14).setValue(eventStart); //start
+              sheet.getRange(rowToUpdate,15).setValue(eventEnd); //end
+              sheet.getRange(rowToUpdate,16).setValue(eventStart.getTime()); //Millisenconds
+              sheet.getRange(rowToUpdate,17).setValue(calColor); //Calendar Color in Hex
+              sheet.getRange(rowToUpdate,18).setValue(eventLastUpdated); //Last Updated
+              
+              //update background color
+              range =  sheet.getRange(rowToUpdate,1,1,18);
+              range.setBackground(calColor);
+              
+            }
           }
           else {
             Logger.log("event does not exist yet in sheet");
@@ -103,21 +144,23 @@ function sync(startDate, endDate, debug) {
                 eventTitle,
                 getDuration(eventStart,eventEnd),
                 calName,
-                "7", //feedback
-                "8", 
+                "", //feedback
+                "", //energy
                 event.getDescription(),
                 calId,
                 eventId,
                 eventStart,
                 eventEnd,
                 eventStart.getTime(),
-                calColor
+                calColor,
+                eventLastUpdated
               ]);
+              numberOfNewEvents++;
           
               //set the background color of the row matching the calendar color
               numberOfRows = sheet.getLastRow();
               Logger.log("number of rows: "+numberOfRows);
-              range =  sheet.getRange(numberOfRows,1,1,17);
+              range =  sheet.getRange(numberOfRows,1,1,18);
               range.setBackground(calColor);
             }
             
@@ -128,8 +171,10 @@ function sync(startDate, endDate, debug) {
           
           
           
+      
           
-          //if calendar already exists in sheet check if system fields are different
+          /////*****//// column R
+          
           
           //if event fields (title, start, end, description) are different update event in sheet
           
@@ -139,12 +184,25 @@ function sync(startDate, endDate, debug) {
         }
         
       }
-      //sort sheet by eventStart
-      sheet.sort(14);
+    //sort sheet by eventStart
+    sheet.sort(15);
       
+    //add back title row from notes sheet
+    var titleValues = SpreadsheetApp.getActive().getRange("notes!A17:Q17").getValues();
+    sheet.insertRows(1);
+    var titleRange = sheet.getRange("A1:Q1");
+    titleRange.setValues(titleValues);
+    SpreadsheetApp.getActive().getRange("notes!A17:R17").copyFormatToRange(sheet, 1, 17, 1, 1);
+    
+    //add day seperators                       
       
+    numberOfRows = sheet.getLastRow();                                                   
       
-    result=result+"<br>Synchronized "+numberOfRows+" rows";   
+    result=result+"<br>Synchronized "+numberOfRows+" rows";  
+    result=result+"<br>of which new: "+numberOfNewEvents+" rows";
+    result=result+"<br>of which updated: "+numberOfEventsUpdated+" rows";  
+    result=result+"<br>of which deleted: "+numberOfDeletedEvents+" rows";
+    
   }
   else {
     result=result+"<br>ERROR: Wrong sheet. Please select the event list sheet before running.";
@@ -187,7 +245,14 @@ function dateToString(date) {
       dateString = "0";
     }
     dateString = dateString+date.getDate().toString();
-    dateString = dateString+"/"+(date.getMonth()+1).toString();
+    
+    if(date.getMonth()<9) {
+      dateString = dateString+"/0";
+    }
+    else {
+      dateString = dateString+"/";
+    }
+    dateString = dateString+(date.getMonth()+1).toString();
     dateString = dateString+"/"+date.getYear();
   }
   return dateString;
@@ -195,6 +260,25 @@ function dateToString(date) {
 
 
 function getTimeFromDate(date) {
+  var timeString = "";
+  
+  if(typeof date == "object") {
+    if(date.getHours()<10) {
+      timeString="0";
+    }
+    timeString = timeString+date.getHours().toString();
+    if(date.getMinutes()<10) {
+      timeString=timeString+":0";
+    }
+    else {
+      timeString=timeString+":";
+    }
+    timeString = timeString+date.getMinutes();
+  }
+  return timeString;
+}
+
+function getUTCTimeFromDate(date) {
   var timeString = "";
   
   if(typeof date == "object") {
@@ -227,7 +311,7 @@ function getDuration(startDate,endDate) {
   durationNumber = durationNumber/1000/60; //convert to minutes
   Logger.log(durationNumber);
   
-  duration = getTimeFromDate(duration);
+  duration = getUTCTimeFromDate(duration);
   
   return duration;
 }
