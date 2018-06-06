@@ -108,32 +108,35 @@ function sync(startDate, endDate, debug) {
               numberOfEventsUpdated++;
               
               //update values
-              sheet.getRange(rowToUpdate,1).setValue(eventStart.getUTCFullYear()); //Year
-              sheet.getRange(rowToUpdate,2).setValue(eventStart.getWeek()); //Week
-              sheet.getRange(rowToUpdate,3).setValue(dateToString(eventStart)); //Date
-              sheet.getRange(rowToUpdate,4).setValue(getTimeFromDate(eventStart)); //Start
-              sheet.getRange(rowToUpdate,5).setValue(getTimeFromDate(eventEnd)); //End
-              sheet.getRange(rowToUpdate,6).setValue(eventTitle); //Title
-              sheet.getRange(rowToUpdate,7).setValue(getDuration(eventStart,eventEnd)); //Duration
-              sheet.getRange(rowToUpdate,8).setValue(calName); //Calendar Name
-              sheet.getRange(rowToUpdate,11).setValue(event.getDescription()); //Comment
-              sheet.getRange(rowToUpdate,12).setValue(calId); //Calendar ID
-              sheet.getRange(rowToUpdate,13).setValue(eventId); //Event ID
-              sheet.getRange(rowToUpdate,14).setValue(eventStart); //start
-              sheet.getRange(rowToUpdate,15).setValue(eventEnd); //end
-              sheet.getRange(rowToUpdate,16).setValue(eventStart.getTime()); //Millisenconds
-              sheet.getRange(rowToUpdate,17).setValue(calColor); //Calendar Color in Hex
-              sheet.getRange(rowToUpdate,18).setValue(eventLastUpdated); //Last Updated
-              
-              //update background color
-              range =  sheet.getRange(rowToUpdate,1,1,18);
-              range.setBackground(calColor);
+              if(debug == false) {
+                sheet.getRange(rowToUpdate,1).setValue(eventStart.getUTCFullYear()); //Year
+                sheet.getRange(rowToUpdate,2).setValue(eventStart.getWeek()); //Week
+                sheet.getRange(rowToUpdate,3).setValue(dateToString(eventStart)); //Date
+                sheet.getRange(rowToUpdate,4).setValue(getTimeFromDate(eventStart)); //Start
+                sheet.getRange(rowToUpdate,5).setValue(getTimeFromDate(eventEnd)); //End
+                sheet.getRange(rowToUpdate,6).setValue(eventTitle); //Title
+                sheet.getRange(rowToUpdate,7).setValue(getDuration(eventStart,eventEnd)); //Duration
+                sheet.getRange(rowToUpdate,8).setValue(calName); //Calendar Name
+                sheet.getRange(rowToUpdate,11).setValue(event.getDescription()); //Comment
+                sheet.getRange(rowToUpdate,12).setValue(calId); //Calendar ID
+                sheet.getRange(rowToUpdate,13).setValue(eventId); //Event ID
+                sheet.getRange(rowToUpdate,14).setValue(eventStart); //start
+                sheet.getRange(rowToUpdate,15).setValue(eventEnd); //end
+                sheet.getRange(rowToUpdate,16).setValue(eventStart.getTime()); //Millisenconds
+                sheet.getRange(rowToUpdate,17).setValue(calColor); //Calendar Color in Hex
+                sheet.getRange(rowToUpdate,18).setValue(eventLastUpdated); //Last Updated
+                
+                //update background color
+                range =  sheet.getRange(rowToUpdate,1,1,18);
+                range.setBackground(calColor);
+              }
               
             }
           }
           else {
             Logger.log("event does not exist yet in sheet");
             
+            //add new rows
             if(debug == false) {
               sheet.appendRow([
                 eventStart.getUTCFullYear(),
