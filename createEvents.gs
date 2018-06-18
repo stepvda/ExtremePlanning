@@ -44,11 +44,13 @@ function createEventsFromListForDate(affectedDate, debug) {
   
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  var sheetName = sheet.getName();
+  var sheetName = "none";
+  sheetName = sheet.getName();
   
   Logger.log("sheet name: "+sheetName);
+  Logger.log("is template: "+sheetName.indexOf("template"));
   
-  if(sheetName == "event template") {
+  if(sheetName.indexOf("template") >= 0) {
 
   var title
   var start

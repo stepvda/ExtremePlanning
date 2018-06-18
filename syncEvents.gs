@@ -33,11 +33,14 @@ function sync(startDate, endDate, debug) {
   var numberOfNewEvents = 0;
   var numberOfDeletedEvents = 0;
   var rowToUpdate;
+  var allEventIdsFromCalendar = [];
 
   var i1;
   var i2;
   var i3;
   var i4;
+  var i5=0;
+  var i6;
   
   var numberOfRows = 0;
   
@@ -82,6 +85,9 @@ function sync(startDate, endDate, debug) {
           eventEnd = event.getEndTime();
           eventId = event.getId();
           eventLastUpdated = event.getLastUpdated();
+          
+          //add eventId to array for deletion check later
+          allEventIdsFromCalendar.push(eventId);
           
           Logger.log("event title: "+eventTitle);
           //Logger.log("event start: "+eventStart);
@@ -176,8 +182,6 @@ function sync(startDate, endDate, debug) {
           
       
           
-          /////*****//// column R
-          
           
           //if event fields (title, start, end, description) are different update event in sheet
           
@@ -187,9 +191,48 @@ function sync(startDate, endDate, debug) {
         }
         
       }
+    
+    //check for rows that need to be deleted if 
+    //   1) the eventId no longer exists in the calendars
+    //    AND
+    //   2) the event is within the sync date range (start date to end date)
+    var matched;
+    var rowToDelete=0;
+    data = sheet.getDataRange().getValues();
+
+    for(i6=0;i6<data.length;i6++) {
+      matched = false;
+        
+      for(i5=0;i5<allEventIdsFromCalendar.length;i5++) {  
+          //  Logger.log("##############"); 
+        if(allEventIdsFromCalendar[i5].toString() == data[i6][12].toString()) { //causes error when reducing range up front
+          matched = true;
+          rowToDelete = i6+2;
+       
+        }
+      }
+      if(matched == false) {
+        Logger.log("deleting row: "+rowToDelete+sheet.getRange(rowToDelete,6).getValue().toString());
+        //before deleting check if within date range (TODO)
+        
+        if(debug == false) {
+          sheet.deleteRow(rowToDelete);
+          data = sheet.getDataRange().getValues();
+        }
+        numberOfDeletedEvents++;
+      }
+          
+    }
+    
+     
+    
+    
     //sort sheet by eventStart
     sheet.sort(15);
-      
+
+    numberOfRows = sheet.getLastRow();                                                   
+
+    
     //add back title row from notes sheet
     var titleValues = SpreadsheetApp.getActive().getRange("notes!A17:Q17").getValues();
     sheet.insertRows(1);
@@ -199,12 +242,12 @@ function sync(startDate, endDate, debug) {
     
     //add day seperators                       
       
-    numberOfRows = sheet.getLastRow();                                                   
       
     result=result+"<br>Synchronized "+numberOfRows+" rows";  
     result=result+"<br>of which new: "+numberOfNewEvents+" rows";
     result=result+"<br>of which updated: "+numberOfEventsUpdated+" rows";  
     result=result+"<br>of which deleted: "+numberOfDeletedEvents+" rows";
+    
     
   }
   else {
