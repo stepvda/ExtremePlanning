@@ -4,7 +4,10 @@ function onOpen() {
   item.addItem('Feedback', 'showFeedbackSidebar');
   item.addItem('Sync', 'showSyncSidebar');
   item.addItem('Analyze', 'showAnalyzeSidebar');
-  item.addItem('Configure', 'showConfigSidebar');
+  item.addSeparator();
+  item.addItem('Setup & Configure', 'showConfigSidebar');
+  item.addSeparator();
+  item.addItem('Help', 'showHelpSidebar');
   
   item.addToUi();
   

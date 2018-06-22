@@ -1,3 +1,4 @@
+////SAMPLE CODE////
 /**
  * Lists 10 upcoming events in the user's calendar.
  */
