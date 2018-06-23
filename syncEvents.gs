@@ -51,6 +51,8 @@ function sync(startDate, endDate, debug) {
   var range;
   var formattingRange;
   
+  var formUrl;
+  
   var calendarFilter = "stepvda.net";
   
   if(sheetName == "event list") {
@@ -130,6 +132,10 @@ function sync(startDate, endDate, debug) {
                 sheet.getRange(rowToUpdate,15).setValue(eventEnd); //end
                 sheet.getRange(rowToUpdate,16).setValue(eventStart.getTime()); //Millisenconds
                 sheet.getRange(rowToUpdate,17).setValue(calColor); //Calendar Color in Hex
+                //***
+ //               sheet.getRange(rowToUpdate,19).setValue(createForm(eventId,calId)); //form Url
+ //               eventLastUpdated = event.getLastUpdated(); //need to get new update date since creating for has updated the event
+                
                 sheet.getRange(rowToUpdate,18).setValue(eventLastUpdated); //Last Updated
                 
                 //update background color
@@ -144,6 +150,9 @@ function sync(startDate, endDate, debug) {
             
             //add new rows
             if(debug == false) {
+       //       formUrl = createForm(eventId,calId);
+       //       eventLastUpdated = event.getLastUpdated(); //need to get new update date since creating for has updated the event
+                
               sheet.appendRow([
                 eventStart.getUTCFullYear(),
                 eventStart.getWeek(),
@@ -155,14 +164,16 @@ function sync(startDate, endDate, debug) {
                 calName,
                 "", //feedback
                 "", //energy
-                event.getDescription(),
+                "", //comment
                 calId,
                 eventId,
                 eventStart,
                 eventEnd,
                 eventStart.getTime(),
                 calColor,
+                //***
                 eventLastUpdated
+           //     formUrl
               ]);
               numberOfNewEvents++;
           

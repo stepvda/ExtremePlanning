@@ -17,6 +17,9 @@ function createEventsFromListForDate(affectedDate, debug) {
   Logger.log("affected date: " + affectedDate);
   Logger.log("affected date type: "+ typeof affectedDate);
   Logger.log("debug: "+debug);
+  
+  var affectedStart;
+  var affectedEnd;
 
   if(typeof affectedDate == "string") {
     var dateDay = new Number(affectedDate.substr(0,2));
@@ -72,8 +75,19 @@ function createEventsFromListForDate(affectedDate, debug) {
    
     calendar = CalendarApp.getCalendarById(data[i][3]); //load calendar into var for affectedDate
     title = data[i][0];
+    
+    //***
     start = data[i][1];   
+    affectedStart = new Date(affectedDate);
+    affectedStart.setHours(data[i][1].getHours());
+    affectedStart.setMinutes(data[i][1].getMinutes());
+    
+    //***
     end = data[i][2];
+    affectedEnd = new Date(affectedDate);
+    affectedEnd.setHours(data[i][2].getHours());
+    affectedEnd.setMinutes(data[i][2].getMinutes());
+    
     
     result=result+"<br>event: "+title
     
@@ -102,7 +116,7 @@ function createEventsFromListForDate(affectedDate, debug) {
     // create new event
     if(!eventExists) {
       if(!debug) {
-        event = calendar.createEvent(title,new Date(start),new Date(end));
+        event = calendar.createEvent(title,new Date(affectedStart),new Date(affectedEnd));
       }
       else {
         result=result+" - debug - creation skipped";
