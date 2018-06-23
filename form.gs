@@ -1,5 +1,6 @@
 function testCreateForm() {
   Logger.log(createForm("19f5u24qenvcrohjqrtusiq9d8@google.com")); //rusten on 22/6/2018 evening
+ 
 }
 
 function createForm(eventId) {
@@ -7,85 +8,142 @@ function createForm(eventId) {
   var form = FormApp.create('Event Feedback');
   var formResponse = form.createResponse();
   var item;
+  var event = getEventFromCalendar(eventId);
+  var eventFeedback = getEventFeedbackFromSheet(eventId);
+  var energy;
+  var feedbackAvailable = false;
   
+  if(typeof eventFeedback == 'object') {
+    feedbackAvailable = true;
+  }
+  Logger.log('feedback: '+ feedbackAvailable);
+  
+  form.setDescription(event.getTitle());
+    
   //Smiley feedback
   item = form.addMultipleChoiceItem()
   item.setTitle('Feedback')
   item.setChoiceValues([':-)',':-|',':-('])
-  formResponse.withItemResponse(item.createResponse(':-|'));
+  if(feedbackAvailable) {
+    formResponse.withItemResponse(item.createResponse(eventFeedback[0]));
+  }
   
   //Energy
   item = form.addGridItem();
   item.setTitle('Energy');
   item.setColumns(['-3','-2','-1','0','+1','+2','+3']);
   item.setRows(['choose:']);
-  item.set
-  formResponse.withItemResponse(item.createResponse(['-1']));
+  if(feedbackAvailable) {
+    energy = eventFeedback[1];
+    formResponse.withItemResponse(item.createResponse([energy]));
+  }
   
   //Comment
   item = form.addParagraphTextItem();
   item.setTitle('Comment');
-  formResponse.withItemResponse(item.createResponse('testResponse'));
+  if(feedbackAvailable) {
+    formResponse.withItemResponse(item.createResponse(eventFeedback[2]));
+  }
   
-  //Comment2
+  //Title
   item = form.addParagraphTextItem();
-  item.setTitle('Comment2');
-  formResponse.withItemResponse(item.createResponse('testResponse2'));
+  item.setTitle('Title');
+  formResponse.withItemResponse(item.createResponse(event.getTitle()));
+  
+  //Date
+  item = form.addParagraphTextItem();
+  item.setTitle('Date');
+  formResponse.withItemResponse(item.createResponse(dateToString(event.getStartTime())));
+  
+  //Start time
+  item = form.addParagraphTextItem();
+  item.setTitle('Start time');
+  formResponse.withItemResponse(item.createResponse(getTimeFromDate(event.getStartTime())));
+  
+  //End time
+  item = form.addParagraphTextItem();
+  item.setTitle('End time');
+  formResponse.withItemResponse(item.createResponse(getTimeFromDate(event.getEndTime())));
+  
+  //Event Id  
+  item = form.addParagraphTextItem();
+  item.setTitle('EventId');
+  formResponse.withItemResponse(item.createResponse(eventId));
+   
   
   
-  
-  //formUrl=form.getPublishedUrl();
+  //get pre-filled URL for form
   formUrl=formResponse.toPrefilledUrl();
+  
+  //store formUrl in event description
+  event.setDescription(formUrl);
   
   return formUrl;
 }
 
 function getEventFromCalendar(eventId) {
   var calendar;
+  var calendarId;
   var sheet;
   var data;
-  var event
+  var event = 0;
+  var found = false;
+  
+  var i1;
   
   //get event list sheet from sheet
+  sheet = SpreadsheetApp.getActive().getSheetByName('event list');
   
   //load sheet into data
+  data = sheet.getDataRange().getValues();
   
   //find row with matching eventId in data
-  
-  //read calendarId
-  
-  //load event from calendar
-  
+  for(i1=0;i1<data.length;i1++) {
+    if(data[i1][12]==eventId) {
+      found = true;
+      //read calendarId
+      calendarId = data[i1][11];
+    }
+  }
+  if(found) {
+    //load event from calendar
+    calendar = CalendarApp.getCalendarById(calendarId);
+    //load event from calendar
+    event = calendar.getEventById(eventId);
+  }
+ 
   return event;
 }
 
-
-
-function sampleForm() {
+function getEventFeedbackFromSheet(eventId) {
+  //var eventFeedback = [':-)','+1','dummy feedback'];
+  var eventFeedback = "none";
   
-  // Create a new form, then add a checkbox question, a multiple choice question,
-  // a page break, then a date question and a grid of questions.
-  var form = FormApp.create('New Form');
-  var item = form.addCheckboxItem();
-  item.setTitle('What condiments would you like on your hot dog?');
-  item.setChoices([
-    item.createChoice('Ketchup'),
-    item.createChoice('Mustard'),
-    item.createChoice('Relish')
-  ]);
-  form.addMultipleChoiceItem()
-  .setTitle('Do you prefer cats or dogs?')
-  .setChoiceValues(['Cats','Dogs'])
-  .showOtherOption(true);
-  form.addPageBreakItem()
-  .setTitle('Getting to know you');
-  form.addDateItem()
-  .setTitle('When were you born?');
-  form.addGridItem()
-  .setTitle('Rate your interests')
-  .setRows(['Cars', 'Computers', 'Celebrities'])
-  .setColumns(['Boring', 'So-so', 'Interesting']);
-  Logger.log('Published URL: ' + form.getPublishedUrl());
-  Logger.log('Editor URL: ' + form.getEditUrl());
+  var calendar;
+  var calendarId;
+  var sheet;
+  var data;
+  var event = 0;
+  var found = false;
   
+  var i1;
+  
+  //get event list sheet from sheet
+  sheet = SpreadsheetApp.getActive().getSheetByName('event list');
+  
+  //load sheet into data
+  data = sheet.getDataRange().getValues();
+  
+  //find row with matching eventId in data
+  for(i1=0;i1<data.length;i1++) {
+    if(data[i1][12]==eventId) {
+      found = true;
+      //create feedback array
+      eventFeedback = [ data[i1][8] , data[i1][9] , data[i1][10] ];    
+    }
+  }
+   
+  return eventFeedback;
 }
+
+
