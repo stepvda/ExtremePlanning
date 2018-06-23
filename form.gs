@@ -1,5 +1,5 @@
 function testCreateForm() {
-  Logger.log(createForm("19f5u24qenvcrohjqrtusiq9d8@google.com", "stepvda.net_duntt2cuqlirkucfamgj0vec18@group.calendar.google.com")); //rusten on 22/6/2018 evening
+  createForm("19f5u24qenvcrohjqrtusiq9d8@google.com", "stepvda.net_duntt2cuqlirkucfamgj0vec18@group.calendar.google.com"); //rusten on 22/6/2018 evening
  
 }
 
@@ -78,49 +78,60 @@ function createForm(eventId, calendarId) {
   formResponse.withItemResponse(item.createResponse(eventId));
    
   
-  
+  //install submit trigger
+  ScriptApp.newTrigger('submitForm')
+    .forForm(form)
+    .onFormSubmit()
+    .create();
+
   //get pre-filled URL for form
   formUrl=formResponse.toPrefilledUrl();
   
   //store formUrl in event description
-  event.setDescription(formUrl);
+  event.setDescription(formUrl); //TODO: need to preserve text content but remove previous form url
   
   Logger.log(formUrl);
   
   return formUrl;
 }
 
+function submitForm(e) {
+//  Logger.log('***Form submitted***');
+//  Logger.log('typeof: '+typeof e);
+//  Logger.log("%s", JSON.stringify(e)); //output object information to string
+  
+  var responses = e.response.getItemResponses();
+  var feedback = responses[0].getResponse();
+  var energy = responses[1].getResponse();
+  var comment = responses[2].getResponse();
+  var eventId = responses[7].getResponse();
+  
+  Logger.log(feedback+energy+comment+eventId);
+  
+  //TODO: store feedback 
+  var sheet = SpreadsheetApp.getActive().getSheetByName('event list');
+  var data = sheet.getDataRange().getValues();
+  var i2;
+  
+
+//  Logger.log("length: "+responses.length);
+//  var i1;
+//  for(i1=0;i1<responses.length;i1++) {
+//    Logger.log(responses[i1].getItem().getTitle()  +": "+ responses[i1].getResponse())
+//    //Logger.log(typeof responses[i1].getResponse())
+//  }
+  
+}
+
 function getEventFromCalendar(eventId, calendarId) {
   var calendar;
-  var calendarId;
-  var sheet;
-  var data;
   var event = 0;
-  var found = false;
-  
-  var i1;
-  
-//  //get event list sheet from sheet
-//  sheet = SpreadsheetApp.getActive().getSheetByName('event list');
-//  
-//  //load sheet into data
-//  data = sheet.getDataRange().getValues();
-//  
-//  //find row with matching eventId in data
-//  for(i1=0;i1<data.length;i1++) {
-//    if(data[i1][12]==eventId) {
-//      found = true;
-//      //read calendarId
-//      calendarId = data[i1][11];
-//    }
-//  }
- 
-//  if(found) {
-    //load event from calendar
-    calendar = CalendarApp.getCalendarById(calendarId);
-    //load event from calendar
-    event = calendar.getEventById(eventId);
-//  }
+
+  //load event from calendar
+  calendar = CalendarApp.getCalendarById(calendarId);
+  //load event from calendar
+  event = calendar.getEventById(eventId);
+
  
   return event;
 }
