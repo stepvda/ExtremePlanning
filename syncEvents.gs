@@ -125,7 +125,7 @@ function sync(startDate, endDate, debug) {
                 sheet.getRange(rowToUpdate,6).setValue(eventTitle); //Title
                 sheet.getRange(rowToUpdate,7).setValue(getDuration(eventStart,eventEnd)); //Duration
                 sheet.getRange(rowToUpdate,8).setValue(calName); //Calendar Name
-                sheet.getRange(rowToUpdate,11).setValue(event.getDescription()); //Comment
+                //sheet.getRange(rowToUpdate,11).setValue(event.getDescription()); //Comment
                 sheet.getRange(rowToUpdate,12).setValue(calId); //Calendar ID
                 sheet.getRange(rowToUpdate,13).setValue(eventId); //Event ID
                 sheet.getRange(rowToUpdate,14).setValue(eventStart); //start
@@ -150,9 +150,11 @@ function sync(startDate, endDate, debug) {
             
             //add new rows
             if(debug == false) {
-       //       formUrl = createForm(eventId,calId);
-       //       eventLastUpdated = event.getLastUpdated(); //need to get new update date since creating for has updated the event
+            //  formUrl = createForm(eventId,calId);
+            //  eventLastUpdated = event.getLastUpdated(); //need to get new update date since creating for has updated the event
                 
+              
+              
               sheet.appendRow([
                 eventStart.getUTCFullYear(),
                 eventStart.getWeek(),
@@ -173,7 +175,7 @@ function sync(startDate, endDate, debug) {
                 calColor,
                 //***
                 eventLastUpdated
-           //     formUrl
+           //     ,formUrl
               ]);
               numberOfNewEvents++;
           

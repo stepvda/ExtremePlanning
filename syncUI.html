@@ -43,6 +43,7 @@
          var div = document.getElementById('sidebarValues');
          div.innerHTML = "<br>working...";
          google.script.run.withSuccessHandler(updateSidebarValues).sync($('#startDate').val(), $('#endDate').val(), $('#debugCheckbox').is(':checked'));
+         
       }
       
       
@@ -53,6 +54,9 @@
         if (returnedValueFromGetTextAreaStuffInYourCodeGSFile !='ErrorStuff'){
           var div = document.getElementById('sidebarValues');
           div.innerHTML =  returnedValueFromGetTextAreaStuffInYourCodeGSFile;
+          
+          div.innerHTML = div.innerHTML+"<br>continuing to link refresh...";
+          
           var errorDiv = document.getElementById('error');
           errorDiv.innerHTML = "";
          

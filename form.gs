@@ -1,5 +1,5 @@
 function testCreateForm() {
-  createForm("19f5u24qenvcrohjqrtusiq9d8@google.com", "stepvda.net_duntt2cuqlirkucfamgj0vec18@group.calendar.google.com"); //rusten on 22/6/2018 evening
+  var link=createForm("19f5u24qenvcrohjqrtusiq9d8@google.com", "stepvda.net_duntt2cuqlirkucfamgj0vec18@group.calendar.google.com"); //rusten on 22/6/2018 evening
  
 }
 
@@ -84,7 +84,8 @@ function createForm(eventId, calendarId) {
   
   //create new description with updated structure 
   event.setDescription( createEventDescription(feedback,energy,comment,link,freeText) );
-    
+  
+  return link;
 }
 
 function parseEventDescription(eventDescription) {
@@ -183,16 +184,54 @@ function submitForm(e) {
   var energy = responses[1].getResponse();
   var comment = responses[2].getResponse();
   var eventId = responses[7].getResponse();
-  
-  Logger.log(feedback+energy+comment+eventId);
+  var link = '';
   
   //store feedback in sheet
   var sheet = SpreadsheetApp.getActive().getSheetByName('event list');
   var data = sheet.getDataRange().getValues();
-  var i2;
+  var i1;
+  var rowToUpdate;
+  var eventIdFound = false;
+  var calendarId;
+  var calendar;
+  var event;
+  var eventDescription;
+  var eventDescriptionArray;
   
-  //store feedback in event
-  
+  for(i1=0;i1<data.length;i1++) {
+    if(eventId == data[i1][12]) {
+      rowToUpdate = i1+1;
+      eventIdFound = true;
+    }
+  }
+  if(eventIdFound) {
+    //update sheet feedback
+    sheet.getRange(rowToUpdate,9).setValue(feedback);
+    sheet.getRange(rowToUpdate,10).setValue(energy);
+    sheet.getRange(rowToUpdate,11).setValue(comment);
+   
+    //get calendarId from sheet
+    calendarId = sheet.getRange(rowToUpdate,12).getValue();
+    
+    //load event
+    calendar = CalendarApp.getCalendarById(calendarId);
+    event = calendar.getEventById(eventId);
+    
+    //create and set new event description with values submitted
+    eventDescription = event.getDescription();
+    eventDescriptionArray = parseEventDescription(eventDescription);
+    eventDescription = createEventDescription(feedback,energy,comment,link,eventDescriptionArray[3]);
+    event.setDescription(eventDescription);
+    
+    //update event pre-filled form
+    link = createForm(eventId,calendarId);
+    
+    //update sheet with link
+    sheet.getRange(rowToUpdate,19).setValue(link);
+  }
+  else {
+    Logger.log("ERROR: eventId from submitForm not found in sheet.");
+  }
   
 }
 
