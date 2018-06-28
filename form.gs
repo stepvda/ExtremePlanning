@@ -26,65 +26,69 @@ function createForm(eventId, calendarId) {
  
   //open event
   event = CalendarApp.getCalendarById(calendarId).getEventById(eventId);
-  
-  var feedback = '';
-  var energy = '';
-  var comment = '';
-  var link = '';
-  var freeText = '';
- 
-  //read fields from event description
-  var eventDescriptionArray = parseEventDescription(event.getDescription());  
-  
-  //verify if event has structured description so the values can be reused
-  if(eventDescriptionArray.length == 4) {
-    feedback = eventDescriptionArray[0];
-    energy = eventDescriptionArray[1];
-    comment = eventDescriptionArray[2];
-    freeText = eventDescriptionArray[3];
-  }
-  //event description is not structure so empty structure is added and existing description is added at the end
-  else {
-    freeText = event.getDescription();
-  }
-   
-  //create form responses
-  var items = form.getItems();
-  var item;
-  var formResponse = form.createResponse();
-  
-  //Feedback
-  item = items[0].asMultipleChoiceItem();
-  formResponse.withItemResponse( item.createResponse([feedback]) );
-  //Energy
-  item = items[1].asGridItem();
-  formResponse.withItemResponse(item.createResponse([energy]));
-  //Comment
-  item = items[2].asParagraphTextItem();
-  formResponse.withItemResponse(item.createResponse(comment));
-  //Title
-  item = items[3].asTextItem();
-  formResponse.withItemResponse(item.createResponse(event.getTitle()));
-  //Date
-  item = items[4].asTextItem();
-  formResponse.withItemResponse(item.createResponse(dateToString(event.getStartTime())));
-  //Start time
-  item = items[5].asTextItem();
-  formResponse.withItemResponse(item.createResponse(getTimeFromDate(event.getStartTime())));
-  //End time
-  item = items[6].asTextItem();
-  formResponse.withItemResponse(item.createResponse(getTimeFromDate(event.getEndTime())));
-  //Event Id  
-  item = items[7].asTextItem();
-  formResponse.withItemResponse(item.createResponse(eventId));
-  
-   
-  //get pre-filled resonse link
-  link = form.shortenFormUrl( formResponse.toPrefilledUrl() );
-  
-  //create new description with updated structure 
-  event.setDescription( createEventDescription(feedback,energy,comment,link,freeText) );
-  
+  if(event != null) {
+    var feedback = '';
+    var energy = '';
+    var comment = '';
+    var link = '';
+    var freeText = '';
+    
+    //read fields from event description
+    var eventDescriptionArray = parseEventDescription(event.getDescription());  
+    
+    //verify if event has structured description so the values can be reused
+    if(eventDescriptionArray.length == 4) {
+      feedback = eventDescriptionArray[0];
+      energy = eventDescriptionArray[1];
+      comment = eventDescriptionArray[2];
+      freeText = eventDescriptionArray[3];
+    }
+    //event description is not structure so empty structure is added and existing description is added at the end
+    else {
+      freeText = event.getDescription();
+    }
+    
+    //create form responses
+    var items = form.getItems();
+    var item;
+    var formResponse = form.createResponse();
+    
+    //Feedback
+    item = items[0].asMultipleChoiceItem();
+    if(feedback.length>0) {
+      formResponse.withItemResponse( item.createResponse([feedback]) );
+    }
+    //Energy
+    item = items[1].asGridItem();
+    if(energy.length>0) {
+      formResponse.withItemResponse(item.createResponse([energy]));
+    }
+    //Comment
+    item = items[2].asParagraphTextItem();
+    formResponse.withItemResponse(item.createResponse(comment));
+    //Title
+    item = items[3].asTextItem();
+    formResponse.withItemResponse(item.createResponse(event.getTitle()));
+    //Date
+    item = items[4].asTextItem();
+    formResponse.withItemResponse(item.createResponse(dateToString(event.getStartTime())));
+    //Start time
+    item = items[5].asTextItem();
+    formResponse.withItemResponse(item.createResponse(getTimeFromDate(event.getStartTime())));
+    //End time
+    item = items[6].asTextItem();
+    formResponse.withItemResponse(item.createResponse(getTimeFromDate(event.getEndTime())));
+    //Event Id  
+    item = items[7].asTextItem();
+    formResponse.withItemResponse(item.createResponse(eventId));
+    
+    
+    //get pre-filled resonse link
+    link = form.shortenFormUrl( formResponse.toPrefilledUrl() );
+    
+    //create new description with updated structure 
+    event.setDescription( createEventDescription(feedback,energy,comment,link,freeText) );
+  }  
   return link;
 }
 
@@ -309,7 +313,7 @@ function getEventFeedbackFromSheet(eventId) {
 }
 
 
-//delete form from preferences and remove trigger from project
+//delete form, form preferences and remove trigger from project
 //WARNING: existing form url's will stop working! You should only use this function for debug purposes.
 function deleteForm() {
   var scriptProperties = PropertiesService.getScriptProperties();

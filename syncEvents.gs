@@ -1,3 +1,46 @@
+
+
+function updateFormLinks() {
+  var result = '';
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  var sheetName = sheet.getName();
+  var i1;
+  var link = '';
+  var eventId;
+  var calendarId;
+  var numberOfLinksAdded = 0;
+  var linklen;
+  var linktype;
+  
+  if(sheetName == "event list") {
+    for(i1=2;i1<=data.length;i1++) {
+      eventId = sheet.getRange(i1,13).getValue();
+      calendarId = sheet.getRange(i1,12).getValue();
+      link = sheet.getRange(i1,19).getValue();
+      linklen=link.length;
+      if(linklen == 0) {
+        link = createForm(eventId,calendarId);
+        linktype = typeof link;
+        if(linktype!='undefined') {
+          sheet.getRange(i1,19).setValue(link);
+          numberOfLinksAdded++;
+        }
+      }
+    }
+  
+  }
+  else {
+    result="<br>ERROR: Wrong sheet. Please select the event list sheet before running.";
+  }
+  
+  if(numberOfLinksAdded>0) {
+    result='Number of form links added: '+numberOfLinksAdded+'<br>Done.';
+  }
+  return result;
+}
+
+
 function sync(startDate, endDate, debug) {
   
   var result =" "

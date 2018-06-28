@@ -46,16 +46,14 @@
          
       }
       
-      
-  
-      
-      
       function updateSidebarValues(returnedValueFromGetTextAreaStuffInYourCodeGSFile) {
         if (returnedValueFromGetTextAreaStuffInYourCodeGSFile !='ErrorStuff'){
           var div = document.getElementById('sidebarValues');
           div.innerHTML =  returnedValueFromGetTextAreaStuffInYourCodeGSFile;
           
           div.innerHTML = div.innerHTML+"<br>continuing to link refresh...";
+          
+          google.script.run.withSuccessHandler(updateSidebarValues2).updateFormLinks();
           
           var errorDiv = document.getElementById('error');
           errorDiv.innerHTML = "";
@@ -68,6 +66,28 @@
           errorDiv.innerHTML = 'There was an error.';
         }
       }
+      
+      
+      function updateSidebarValues2(returnedValueFromGetTextAreaStuffInYourCodeGSFile) {
+        if (returnedValueFromGetTextAreaStuffInYourCodeGSFile !='ErrorStuff'){
+          var div = document.getElementById('sidebarValues');
+          
+          div.innerHTML = div.innerHTML+"<br>"+returnedValueFromGetTextAreaStuffInYourCodeGSFile;
+          
+          var errorDiv = document.getElementById('error');
+          errorDiv.innerHTML = "";
+         
+        }
+        else{
+          var div = document.getElementById('sidebarValues');
+         // div.innerHTML = "";
+          var errorDiv = document.getElementById('error');
+          errorDiv.innerHTML = 'There was an error.';
+        }
+      }
+      
+      
+      
     </script>
   </body>
 </html>
