@@ -25,7 +25,7 @@ function updateFormLinks() {
         if(linktype!='undefined') {
           sheet.getRange(i1,19).setValue(link);
           numberOfLinksAdded++;
-        }
+        }       
       }
     }
   

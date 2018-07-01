@@ -26,6 +26,7 @@ function createForm(eventId, calendarId) {
  
   //open event
   event = CalendarApp.getCalendarById(calendarId).getEventById(eventId);
+  
   if(event != null) {
     var feedback = '';
     var energy = '';
@@ -181,7 +182,7 @@ function createNewForm() {
 function submitForm(e) {
 //  Logger.log('***Form submitted***');
 //  Logger.log('typeof: '+typeof e);
-//  Logger.log("%s", JSON.stringify(e)); //output object information to string
+// Logger.log("%s", JSON.stringify(e)); //output object information to string
   
   var responses = e.response.getItemResponses();
   var feedback = responses[0].getResponse();
