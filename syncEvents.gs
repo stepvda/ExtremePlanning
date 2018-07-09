@@ -248,10 +248,7 @@ function sync(startDate, endDate, debug) {
         
       }
     
-    //check for rows that need to be deleted if 
-    //   1) the eventId no longer exists in the calendars
-    //    AND
-    //   2) the event is within the sync date range (start date to end date)
+    //check for rows that need to be deleted if the eventId no longer exists in the calendars
     var matched;
     var rowToDelete=0;
     data = sheet.getDataRange().getValues();
